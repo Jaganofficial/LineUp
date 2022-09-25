@@ -1,6 +1,7 @@
 package com.lineup.app.repository
 
 import com.lineup.app.data.LineUpDatabaseDAO
+import com.lineup.app.models.LineUpObject
 import com.lineup.app.models.homeScreenObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -35,8 +36,47 @@ class LineUpRepository @Inject constructor(private val lineUpDatabaseDAO: LineUp
     //Delete a single category
     suspend fun deleteCategory(homeScreenObject: homeScreenObject) =
         lineUpDatabaseDAO.deleteCategory(homeScreenObject = homeScreenObject)
-
     //}
 
+
+    //Details Screen
+    //{
+
+    //Get all details for the given category
+    fun getAllDetailsFromTheCategory(category_id: String):Flow<List<LineUpObject>> {
+        return lineUpDatabaseDAO.getAllDetailsFromThisCategory(category_id = category_id)
+    }
+
+    //Get the given detail
+    suspend fun getDetail(details_id: String):LineUpObject {
+        return lineUpDatabaseDAO.getDetails(details_id = details_id)
+    }
+
+    //Add the given detail
+    suspend fun addDetail(lineUpObject: LineUpObject) {
+        lineUpDatabaseDAO.addDetail(lineUpObject)
+    }
+
+    //update the given detail
+    suspend fun updateDetail(lineUpObject: LineUpObject) {
+        lineUpDatabaseDAO.updateDetail(lineUpObject = lineUpObject)
+    }
+
+    //Delete all details from all the category
+    suspend fun deleteAllDetailsFromAllCategory() {
+        lineUpDatabaseDAO.deleteAllDetailsFromAllCategory()
+    }
+
+    //Delete all details from the given category
+    suspend fun deleteAllDetailsInThisCategory(category_id: String) {
+        lineUpDatabaseDAO.deleteAllDetailsInThisCategory(category_id = category_id)
+    }
+
+    //Delete the given details
+    suspend fun deleteDetail(lineUpObject: LineUpObject) {
+        lineUpDatabaseDAO.deleteDetail(lineUpObject = lineUpObject)
+    }
+
+    //}
 
 }
