@@ -4,6 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -17,11 +19,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
+import androidx.navigation.NavController
+import com.lineup.app.components.DetailsCard
 import com.lineup.app.models.LineUpObject
 import com.lineup.app.models.homeScreenObject
+import com.lineup.app.navigation.LineUpScreens
 
 @Composable
-fun DetailsScreen(detailsScreenViewModel: DetailsScreenViewModel, categoryId: String?) {
+fun DetailsScreen(
+    detailsScreenViewModel: DetailsScreenViewModel,
+    categoryId: String?,
+    navigationController: NavController
+) {
 
     val lifecycleOwner = LocalLifecycleOwner.current
     val detailsListFlowLifecycleAware = remember(
@@ -55,7 +64,7 @@ fun DetailsScreen(detailsScreenViewModel: DetailsScreenViewModel, categoryId: St
                     })
         }, backgroundColor = Color.Transparent)
 
-        DetailsList(detailsList, categoryDetails)
+        DetailsList(detailsList, categoryDetails, navigationController = navigationController)
 
         if (detailsScreenViewModel.showAddDetailsDialogue.value) {
             addDetails(categoryId = categoryId, onDismissRequest = {
@@ -72,29 +81,23 @@ fun DetailsScreen(detailsScreenViewModel: DetailsScreenViewModel, categoryId: St
 @Composable
 private fun DetailsList(
     detailsList: List<LineUpObject>,
-    categoryDetails: homeScreenObject
+    categoryDetails: homeScreenObject,
+    navigationController: NavController
 ) {
     if (detailsList.isNullOrEmpty()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = "Click + to add new ${categoryDetails.category_Name}", style = TextStyle(color = MaterialTheme.colors.onSurface))
+            Text(
+                text = "Click + to add new ${categoryDetails.category_Name}",
+                style = TextStyle(color = MaterialTheme.colors.onSurface)
+            )
         }
     } else {
         LazyColumn {
             items(detailsList)
             {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .padding(25.dp), elevation = 10.dp
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(text = it.name)
-                    }
-                }
+                DetailsCard(modifier = Modifier.clickable {
+                    navigationController.navigate(LineUpScreens.MoreDetailsScreen.name + "/${it.line_up_object_id}")
+                }, it)
             }
         }
     }
@@ -115,6 +118,21 @@ private fun addDetails(
         mutableStateOf("")
     }
 
+    var detailDescription by remember {
+        mutableStateOf("")
+    }
+
+    var detailLink by remember {
+        mutableStateOf("")
+    }
+    var detailGenre by remember {
+        mutableStateOf("")
+    }
+
+    var detailPlatform by remember {
+        mutableStateOf("")
+    }
+
     AlertDialog(
         onDismissRequest = {
             onDismissRequest()
@@ -125,6 +143,7 @@ private fun addDetails(
                 horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 45.dp, end = 45.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
                 OutlinedTextField(value = detailName, label = {
                     Text(text = "Category Name")
@@ -140,11 +159,44 @@ private fun addDetails(
                 }, modifier = Modifier.padding(10.dp))
                 Spacer(modifier = Modifier.height(10.dp))
 
+                OutlinedTextField(value = detailDescription, label = {
+                    Text(text = "Description")
+                }, onValueChange = {
+                    detailDescription = it
+                }, modifier = Modifier.padding(10.dp))
+                Spacer(modifier = Modifier.height(10.dp))
+
+                OutlinedTextField(value = detailPlatform, label = {
+                    Text(text = "Platform")
+                }, onValueChange = {
+                    detailPlatform = it
+                }, modifier = Modifier.padding(10.dp))
+                Spacer(modifier = Modifier.height(10.dp))
+
+                OutlinedTextField(value = detailLink, label = {
+                    Text(text = "Image Link")
+                }, onValueChange = {
+                    detailLink = it
+                }, modifier = Modifier.padding(10.dp))
+                Spacer(modifier = Modifier.height(10.dp))
+
+                OutlinedTextField(value = detailGenre, label = {
+                    Text(text = "Genre")
+                }, onValueChange = {
+                    detailGenre = it
+                }, modifier = Modifier.padding(10.dp))
+                Spacer(modifier = Modifier.height(10.dp))
+
+
                 Button(onClick = {
                     onAddDetail(
                         LineUpObject(
                             name = detailName,
                             year = detailYear,
+                            platform = detailPlatform,
+                            genre = detailGenre,
+                            description = detailDescription,
+                            image_url = detailLink,
                             category_id = categoryId.toString()
                         )
                     )

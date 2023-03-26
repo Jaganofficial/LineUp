@@ -97,8 +97,12 @@ dependencies {
     // Jetpack Compose Integration
     implementation "androidx.navigation:navigation-compose:$nav_version"
 
+    //Hilt and Dagger
     implementation "com.google.dagger:hilt-android:2.38.1"
     kapt "com.google.dagger:hilt-compiler:2.38.1"
+
+    //Coil
+    implementation("io.coil-kt:coil-compose:2.2.1")
 
 
 }
